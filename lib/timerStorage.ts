@@ -1,119 +1,123 @@
-import { promises as fs } from 'fs';
-import path from 'path';
 import { randomBytes } from 'crypto';
-import { Timer, TimerState } from '@/types/timer';
+import { TimerRecord, Timer } from '@/types/timer';
 
-const TIMERS_DIR = path.join(process.cwd(), '.timers');
-
-const inMemoryCache = new Map<string, Timer>();
-
-async function ensureTimersDir() {
-  try {
-    await fs.mkdir(TIMERS_DIR, { recursive: true });
-  } catch (error) {
-    console.error('Failed to create timers directory:', error);
-  }
-}
+const store = new Map<string, TimerRecord>();
 
 function generateId(): string {
   return randomBytes(8).toString('hex');
 }
 
-export async function createTimer(initialSeconds: number): Promise<string> {
-  await ensureTimersDir();
+function computeCurrentSeconds(record: TimerRecord): number {
+  if (record.state === 'finished') return 0;
+  if (record.state === 'paused' || record.startedAt === null) {
+    return record.secondsWhenPaused;
+  }
+  const elapsedSeconds = (Date.now() - record.startedAt) / 1000;
+  return Math.max(0, record.secondsWhenPaused - elapsedSeconds);
+}
 
+function toTimer(record: TimerRecord): Timer {
+  return {
+    id: record.id,
+    initialSeconds: record.initialSeconds,
+    currentSeconds: Math.floor(computeCurrentSeconds(record)),
+    state: record.state,
+    createdAt: record.createdAt,
+    updatedAt: record.updatedAt,
+  };
+}
+
+export function createTimer(initialSeconds: number): string {
   const id = generateId();
   const now = Date.now();
-
-  const timer: Timer = {
+  store.set(id, {
     id,
     initialSeconds,
-    currentSeconds: initialSeconds,
+    secondsWhenPaused: initialSeconds,
+    startedAt: null,
     state: 'paused',
     createdAt: now,
     updatedAt: now,
-  };
-
-  inMemoryCache.set(id, timer);
-
-  const filePath = path.join(TIMERS_DIR, `${id}.json`);
-  await fs.writeFile(filePath, JSON.stringify(timer, null, 2));
-
+  });
   return id;
 }
 
-export async function getTimer(id: string): Promise<Timer | null> {
-  if (inMemoryCache.has(id)) {
-    return inMemoryCache.get(id) || null;
+export function getTimer(id: string): Timer | null {
+  const record = store.get(id);
+  if (!record) return null;
+
+  const current = computeCurrentSeconds(record);
+  if (record.state === 'running' && current <= 0) {
+    const finished: TimerRecord = { ...record, state: 'finished', secondsWhenPaused: 0, startedAt: null, updatedAt: Date.now() };
+    store.set(id, finished);
+    return toTimer(finished);
   }
 
-  try {
-    const filePath = path.join(TIMERS_DIR, `${id}.json`);
-    const data = await fs.readFile(filePath, 'utf-8');
-    const timer = JSON.parse(data) as Timer;
-    inMemoryCache.set(id, timer);
-    return timer;
-  } catch (error) {
-    return null;
-  }
+  return toTimer(record);
 }
 
-export async function updateTimer(id: string, updates: Partial<Timer>): Promise<Timer | null> {
-  const timer = await getTimer(id);
-  if (!timer) return null;
+export function startTimer(id: string): Timer | null {
+  const record = store.get(id);
+  if (!record) return null;
+  if (record.state === 'running') return toTimer(record);
 
-  const updated: Timer = {
-    ...timer,
-    ...updates,
+  const current = computeCurrentSeconds(record);
+  if (current <= 0) return toTimer(record);
+
+  const updated: TimerRecord = {
+    ...record,
+    state: 'running',
+    startedAt: Date.now(),
+    secondsWhenPaused: current,
     updatedAt: Date.now(),
   };
-
-  inMemoryCache.set(id, updated);
-
-  const filePath = path.join(TIMERS_DIR, `${id}.json`);
-  await fs.writeFile(filePath, JSON.stringify(updated, null, 2));
-
-  return updated;
+  store.set(id, updated);
+  return toTimer(updated);
 }
 
-export async function deleteTimer(id: string): Promise<void> {
-  inMemoryCache.delete(id);
-  try {
-    const filePath = path.join(TIMERS_DIR, `${id}.json`);
-    await fs.unlink(filePath);
-  } catch (error) {
-    console.error(`Failed to delete timer ${id}:`, error);
-  }
+export function pauseTimer(id: string): Timer | null {
+  const record = store.get(id);
+  if (!record) return null;
+
+  const current = computeCurrentSeconds(record);
+  const updated: TimerRecord = {
+    ...record,
+    state: 'paused',
+    startedAt: null,
+    secondsWhenPaused: current,
+    updatedAt: Date.now(),
+  };
+  store.set(id, updated);
+  return toTimer(updated);
 }
 
-export async function getAllTimers(): Promise<Timer[]> {
-  await ensureTimersDir();
-  try {
-    const files = await fs.readdir(TIMERS_DIR);
-    const timers: Timer[] = [];
+export function resetTimer(id: string): Timer | null {
+  const record = store.get(id);
+  if (!record) return null;
 
-    for (const file of files) {
-      if (file.endsWith('.json')) {
-        const id = file.replace('.json', '');
-        const timer = await getTimer(id);
-        if (timer) timers.push(timer);
-      }
-    }
-
-    return timers;
-  } catch (error) {
-    console.error('Failed to read timers directory:', error);
-    return [];
-  }
+  const updated: TimerRecord = {
+    ...record,
+    state: 'paused',
+    startedAt: null,
+    secondsWhenPaused: record.initialSeconds,
+    updatedAt: Date.now(),
+  };
+  store.set(id, updated);
+  return toTimer(updated);
 }
 
-export async function cleanupInactiveTimers(maxAgeMs: number = 24 * 60 * 60 * 1000): Promise<void> {
-  const now = Date.now();
-  const timers = await getAllTimers();
+export function setTimerTime(id: string, seconds: number): Timer | null {
+  const record = store.get(id);
+  if (!record) return null;
 
-  for (const timer of timers) {
-    if (now - timer.updatedAt > maxAgeMs) {
-      await deleteTimer(timer.id);
-    }
-  }
+  const updated: TimerRecord = {
+    ...record,
+    initialSeconds: seconds,
+    secondsWhenPaused: seconds,
+    startedAt: null,
+    state: 'paused',
+    updatedAt: Date.now(),
+  };
+  store.set(id, updated);
+  return toTimer(updated);
 }
