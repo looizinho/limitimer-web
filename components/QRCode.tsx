@@ -1,6 +1,6 @@
 'use client';
 
-import QRCode from 'qrcode.react';
+import { QRCodeCanvas } from 'qrcode.react';
 
 interface QRCodeComponentProps {
   timerId: string;
@@ -14,7 +14,7 @@ export default function QRCodeComponent({ timerId }: QRCodeComponentProps) {
   return (
     <div className="flex flex-col items-center gap-4">
       <p className="text-sm text-gray-600 dark:text-gray-400">Escaneie para controlar</p>
-      <QRCode
+      <QRCodeCanvas
         value={mobileUrl}
         size={200}
         level="H"

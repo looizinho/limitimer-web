@@ -11,10 +11,11 @@ import { TimerUpdate } from '@/types/timer';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const timer = await getTimer(params.id);
+    const { id } = await params;
+    const timer = await getTimer(id);
     if (!timer) {
       return NextResponse.json(
         { error: 'Timer not found' },
@@ -33,25 +34,26 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const body = (await request.json()) as TimerUpdate;
     const { action, seconds } = body;
 
     let result;
     switch (action) {
       case 'start':
-        result = await startTimer(params.id);
+        result = await startTimer(id);
         break;
       case 'pause':
-        result = await pauseTimer(params.id);
+        result = await pauseTimer(id);
         break;
       case 'reset':
-        result = await resetTimer(params.id);
+        result = await resetTimer(id);
         break;
       case 'stop':
-        result = await pauseTimer(params.id);
+        result = await pauseTimer(id);
         break;
       case 'set-time':
         if (seconds === undefined) {
@@ -60,7 +62,7 @@ export async function PUT(
             { status: 400 }
           );
         }
-        result = await setTimerTime(params.id, seconds);
+        result = await setTimerTime(id, seconds);
         break;
       default:
         return NextResponse.json(
