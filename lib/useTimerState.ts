@@ -12,7 +12,7 @@ export function useTimerState({ timerId, pollInterval = 1000 }: UseTimerStateOpt
   const [timer, setTimer] = useState<Timer | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const pollTimeoutRef = useRef<NodeJS.Timeout>();
+  const pollTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
   const isMountedRef = useRef(true);
 
   const fetchTimer = useCallback(async () => {
