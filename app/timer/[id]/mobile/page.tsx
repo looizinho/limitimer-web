@@ -1,17 +1,24 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useTimerState } from '@/lib/useTimerState';
 import TimerDisplay from '@/components/TimerDisplay';
 import { useParams } from 'next/navigation';
-import { useState } from 'react';
 
 export default function MobileTimer() {
   const params = useParams();
   const timerId = params.id as string;
-  const { timer, loading, error, start, pause, stop, reset, setTime } = useTimerState({
+  const { timer, loading, error, start, pause, stop, reset, setTime, markQrScanned } = useTimerState({
     timerId,
   });
   const [inputValue, setInputValue] = useState('');
+
+  // Mark QR as scanned when mobile page loads
+  useEffect(() => {
+    if (timer && !timer.qrCodeScanned) {
+      markQrScanned();
+    }
+  }, [timer?.id]);
 
   if (loading) {
     return (
@@ -53,9 +60,12 @@ export default function MobileTimer() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 dark:bg-black p-4">
       <div className="w-full max-w-md">
-        <h1 className="text-2xl font-bold text-center mb-8 text-black dark:text-white">
-          Controle do Timer
+        <h1 className="text-2xl font-bold text-center mb-2 text-black dark:text-white">
+          {timer.eventName}
         </h1>
+        <h2 className="text-lg text-center mb-8 text-zinc-600 dark:text-zinc-400">
+          Controle do Timer
+        </h2>
 
         <div className="bg-white dark:bg-zinc-900 rounded-lg p-6 mb-6">
           <p className="text-center text-gray-600 dark:text-gray-400 mb-2">Tempo atual</p>

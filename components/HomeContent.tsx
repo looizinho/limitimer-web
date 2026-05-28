@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 export default function HomeContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [eventName, setEventName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [expired, setExpired] = useState(false);
@@ -25,7 +26,10 @@ export default function HomeContent() {
       const response = await fetch('/api/timers', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ initialSeconds: 60 }),
+        body: JSON.stringify({
+          eventName: eventName || 'Sem nome',
+          initialSeconds: 60,
+        }),
       });
 
       if (!response.ok) {
@@ -40,9 +44,15 @@ export default function HomeContent() {
     }
   };
 
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleCreateTimer();
+    }
+  };
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-zinc-50 to-white dark:from-black dark:to-zinc-900">
-      <main className="flex flex-col items-center justify-center gap-8 px-4">
+      <main className="flex flex-col items-center justify-center gap-8 px-4 max-w-md w-full">
         <div className="text-center">
           <h1 className="text-4xl sm:text-5xl font-bold text-black dark:text-white mb-4">
             Limitimer
@@ -52,17 +62,31 @@ export default function HomeContent() {
           </p>
         </div>
 
+        <div className="w-full">
+          <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
+            Nome do Evento
+          </label>
+          <input
+            type="text"
+            value={eventName}
+            onChange={(e) => setEventName(e.target.value)}
+            onKeyPress={handleKeyPress}
+            placeholder="Ex: Reunião, Apresentação..."
+            className="w-full px-4 py-2 rounded-lg border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-900 text-black dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white"
+          />
+        </div>
+
         <button
           onClick={handleCreateTimer}
           disabled={loading}
-          className="px-8 py-3 bg-black dark:bg-white text-white dark:text-black rounded-lg font-semibold text-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full px-8 py-3 bg-black dark:bg-white text-white dark:text-black rounded-lg font-semibold text-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? 'Criando...' : 'Criar Timer'}
         </button>
 
         {expired && (
-          <p className="text-amber-600 dark:text-amber-400 text-center max-w-md">
-            ⏱️ Timer expirou. Timers em memória são temporários — crie um novo para começar.
+          <p className="text-amber-600 dark:text-amber-400 text-center">
+            ⏱️ Timer expirou. Crie um novo para começar.
           </p>
         )}
 
