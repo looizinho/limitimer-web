@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { Timer } from '@/types/timer';
 
 interface UseTimerStateOptions {
@@ -9,22 +10,49 @@ interface UseTimerStateOptions {
 }
 
 export function useTimerState({ timerId, pollInterval = 1000 }: UseTimerStateOptions) {
+  const router = useRouter();
   const [timer, setTimer] = useState<Timer | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const pollTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
   const isMountedRef = useRef(true);
+  const hasShownExpiredRef = useRef(false);
 
   const fetchTimer = useCallback(async () => {
     try {
       const response = await fetch(`/api/timers/${timerId}`);
+
+      if (response.status === 404) {
+        // Timer not found on server — try to restore from localStorage
+        const cached = localStorage.getItem(`timer_${timerId}`);
+        if (cached) {
+          const timerData = JSON.parse(cached) as Timer;
+          if (isMountedRef.current) {
+            setTimer(timerData);
+            setError(null);
+          }
+        } else {
+          // No cache — timer expired, redirect home
+          if (isMountedRef.current && !hasShownExpiredRef.current) {
+            hasShownExpiredRef.current = true;
+            setTimeout(() => {
+              router.push('/?expired=true');
+            }, 2000);
+          }
+        }
+        return;
+      }
+
       if (!response.ok) {
         throw new Error('Failed to fetch timer');
       }
+
       const data = (await response.json()) as Timer;
       if (isMountedRef.current) {
         setTimer(data);
         setError(null);
+        // Cache to localStorage
+        localStorage.setItem(`timer_${timerId}`, JSON.stringify(data));
       }
     } catch (err) {
       if (isMountedRef.current) {
@@ -35,7 +63,7 @@ export function useTimerState({ timerId, pollInterval = 1000 }: UseTimerStateOpt
         setLoading(false);
       }
     }
-  }, [timerId]);
+  }, [timerId, router]);
 
   const pollTimer = useCallback(() => {
     fetchTimer();
@@ -65,12 +93,26 @@ export function useTimerState({ timerId, pollInterval = 1000 }: UseTimerStateOpt
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ action, seconds }),
         });
+
+        if (response.status === 404) {
+          // Timer expired
+          if (!hasShownExpiredRef.current) {
+            hasShownExpiredRef.current = true;
+            setTimeout(() => {
+              router.push('/?expired=true');
+            }, 2000);
+          }
+          return null;
+        }
+
         if (!response.ok) {
           throw new Error('Failed to update timer');
         }
+
         const data = (await response.json()) as Timer;
         if (isMountedRef.current) {
           setTimer(data);
+          localStorage.setItem(`timer_${timerId}`, JSON.stringify(data));
         }
         return data;
       } catch (err) {
@@ -80,7 +122,7 @@ export function useTimerState({ timerId, pollInterval = 1000 }: UseTimerStateOpt
         return null;
       }
     },
-    [timerId]
+    [timerId, router]
   );
 
   return {
