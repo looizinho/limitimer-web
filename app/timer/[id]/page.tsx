@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { useTimerState } from '@/lib/useTimerState';
 import TimerDisplay from '@/components/TimerDisplay';
 import QRCodeComponent from '@/components/QRCode';
@@ -8,7 +9,8 @@ import { useParams } from 'next/navigation';
 export default function DesktopTimer() {
   const params = useParams();
   const timerId = params.id as string;
-  const { timer, loading, error, reset } = useTimerState({ timerId });
+  const { timer, loading, error, reset, markQrScanned } = useTimerState({ timerId });
+  const [showQR, setShowQR] = useState(false);
 
   if (loading) {
     return (
@@ -39,9 +41,26 @@ export default function DesktopTimer() {
     }
   };
 
+  const handleShowQR = () => {
+    setShowQR(true);
+    markQrScanned();
+  };
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-black text-white p-4">
-      <div className="flex flex-col items-center gap-8 w-full">
+      <div className="flex flex-col items-center gap-8 w-full max-w-2xl">
+        <div className="flex justify-between items-start w-full">
+          <h1 className="text-3xl font-bold">{timer.eventName}</h1>
+          {!timer.qrCodeScanned && !showQR && (
+            <button
+              onClick={handleShowQR}
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg font-semibold text-sm transition-colors"
+            >
+              Mostrar QR
+            </button>
+          )}
+        </div>
+
         <div>
           <TimerDisplay seconds={timer.currentSeconds} size="large" />
           <p className="text-center text-2xl mt-4 text-gray-400">
@@ -62,9 +81,17 @@ export default function DesktopTimer() {
           Resetar
         </button>
 
-        <div className="mt-8 p-6 bg-white rounded-lg">
-          <QRCodeComponent timerId={timerId} />
-        </div>
+        {showQR && (
+          <div className="flex flex-col items-center gap-4 p-6 bg-white rounded-lg">
+            <QRCodeComponent timerId={timerId} />
+            <button
+              onClick={() => setShowQR(false)}
+              className="px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100 rounded transition-colors"
+            >
+              Ocultar QR
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

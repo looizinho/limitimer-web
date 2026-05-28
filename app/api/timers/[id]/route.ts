@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getTimer, startTimer, pauseTimer, resetTimer, setTimerTime } from '@/lib/timerStorage';
+import { getTimer, startTimer, pauseTimer, resetTimer, setTimerTime, markQrCodeScanned } from '@/lib/timerStorage';
 import { TimerUpdate } from '@/types/timer';
 
 export async function GET(
@@ -8,7 +8,7 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const timer = getTimer(id);
+    const timer = await getTimer(id);
     if (!timer) {
       return NextResponse.json({ error: 'Timer not found' }, { status: 404 });
     }
@@ -31,20 +31,23 @@ export async function PUT(
     let result;
     switch (action) {
       case 'start':
-        result = startTimer(id);
+        result = await startTimer(id);
         break;
       case 'pause':
       case 'stop':
-        result = pauseTimer(id);
+        result = await pauseTimer(id);
         break;
       case 'reset':
-        result = resetTimer(id);
+        result = await resetTimer(id);
         break;
       case 'set-time':
         if (seconds === undefined) {
           return NextResponse.json({ error: 'Seconds required for set-time action' }, { status: 400 });
         }
-        result = setTimerTime(id, seconds);
+        result = await setTimerTime(id, seconds);
+        break;
+      case 'mark-qr-scanned':
+        result = await markQrCodeScanned(id);
         break;
       default:
         return NextResponse.json({ error: 'Invalid action' }, { status: 400 });

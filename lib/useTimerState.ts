@@ -134,5 +134,6 @@ export function useTimerState({ timerId, pollInterval = 1000 }: UseTimerStateOpt
     stop: () => updateTimer('stop'),
     reset: () => updateTimer('reset'),
     setTime: (seconds: number) => updateTimer('set-time', seconds),
+    markQrScanned: () => updateTimer('mark-qr-scanned'),
   };
 }
