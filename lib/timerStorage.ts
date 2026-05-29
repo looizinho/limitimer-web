@@ -157,3 +157,18 @@ export async function markQrCodeScanned(id: string): Promise<Timer | null> {
 
   return updatedRecord ? toTimer(updatedRecord) : null;
 }
+
+export async function getTimersByUserId(userId: string): Promise<Timer[]> {
+  const collection = await getTimersCollection();
+  const records = await collection.find({ userId }).sort({ createdAt: -1 }).toArray();
+
+  return records.map(record => {
+    const current = computeCurrentSeconds(record);
+    // Update finished state if timer has expired
+    if (record.state === 'running' && current <= 0) {
+      const finished = { ...record, state: 'finished' as const, secondsWhenPaused: 0, startedAt: null };
+      return toTimer(finished);
+    }
+    return toTimer(record);
+  });
+}

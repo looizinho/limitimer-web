@@ -1,10 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { useAuth } from '@/lib/useAuthContext';
 
 export default function LoginPanel() {
-  const { isLoggedIn, username, login, logout, loading: authLoading } = useAuth();
+  const { userId, isLoggedIn, username, login, logout, loading: authLoading } = useAuth();
   const [username_input, setUsernameInput] = useState('');
   const [pin_input, setPinInput] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -55,12 +56,15 @@ export default function LoginPanel() {
     return null;
   }
 
-  if (isLoggedIn) {
+  if (isLoggedIn && userId) {
     return (
       <div className="fixed top-4 right-4 flex items-center gap-3 bg-white dark:bg-zinc-900 px-4 py-2 rounded-lg shadow-lg border border-zinc-300 dark:border-zinc-600">
-        <span className="text-sm font-medium text-black dark:text-white">
+        <Link
+          href={`/user/${userId}`}
+          className="text-sm font-medium text-black dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+        >
           {username}
-        </span>
+        </Link>
         <button
           onClick={logout}
           className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-sm rounded transition-colors"
