@@ -9,6 +9,7 @@ export interface TimerRecord {
   startedAt: number | null;
   state: TimerState;
   qrCodeScanned: boolean;
+  userId?: string;
   createdAt: number;
   updatedAt: number;
 }
@@ -20,6 +21,7 @@ export interface Timer {
   currentSeconds: number;
   state: TimerState;
   qrCodeScanned: boolean;
+  userId?: string;
   createdAt: number;
   updatedAt: number;
 }

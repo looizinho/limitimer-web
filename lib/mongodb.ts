@@ -3,7 +3,7 @@ import { TimerRecord } from '@/types/timer';
 
 let cachedDb: Db | null = null;
 
-async function connectToDatabase(): Promise<Db> {
+export async function connectToDatabase(): Promise<Db> {
   if (cachedDb) {
     return cachedDb;
   }

@@ -2,11 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useAuth } from '@/lib/useAuthContext';
 import Footer from './Footer';
+import LoginPanel from './LoginPanel';
 
 export default function HomeContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { userId } = useAuth();
   const [eventName, setEventName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -30,6 +33,7 @@ export default function HomeContent() {
         body: JSON.stringify({
           eventName: eventName || 'Sem nome',
           initialSeconds: 60,
+          ...(userId && { userId }),
         }),
       });
 
@@ -53,6 +57,7 @@ export default function HomeContent() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-zinc-50 to-white dark:from-black dark:to-zinc-900">
+      <LoginPanel />
       <main className="flex flex-col items-center justify-center gap-8 px-4 max-w-md w-full">
         <div className="text-center">
           <h1 className="text-4xl sm:text-5xl font-bold text-black dark:text-white mb-4">
