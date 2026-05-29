@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTimerState } from '@/lib/useTimerState';
 import TimerDisplay from '@/components/TimerDisplay';
 import QRCodeComponent from '@/components/QRCode';
@@ -11,6 +11,28 @@ export default function DesktopTimer() {
   const timerId = params.id as string;
   const { timer, loading, error, reset, markQrScanned } = useTimerState({ timerId });
   const [showQR, setShowQR] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, []);
+
+  const toggleFullscreen = async () => {
+    try {
+      if (document.fullscreenElement) {
+        await document.exitFullscreen();
+      } else {
+        await document.documentElement.requestFullscreen();
+      }
+    } catch {
+      console.error('Erro ao alternar tela cheia');
+    }
+  };
 
   if (loading) {
     return (
@@ -47,7 +69,22 @@ export default function DesktopTimer() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-black text-white p-4">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-black text-white p-4 relative">
+      <button
+        onClick={toggleFullscreen}
+        className="absolute top-4 right-4 p-2 rounded-lg bg-white text-black hover:opacity-80 transition-opacity"
+        title={isFullscreen ? 'Sair de Tela Cheia' : 'Tela Cheia'}
+      >
+        {isFullscreen ? (
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        ) : (
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4m-4 0l5 5m11-5v4m0-4h-4m4 0l-5 5M4 20v-4m0 4h4m-4 0l5-5m11 5v-4m0 4h-4m4 0l-5-5" />
+          </svg>
+        )}
+      </button>
       <div className="flex flex-col items-center gap-8 w-full max-w-2xl">
         <div className="flex justify-between items-start w-full">
           <h1 className="text-3xl font-bold">{timer.eventName}</h1>
