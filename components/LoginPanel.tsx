@@ -69,14 +69,10 @@ export default function LoginPanel() {
   return (
     <form
       onSubmit={handleLogin}
-      className="fixed top-4 right-4 bg-white dark:bg-zinc-900 p-4 rounded-lg shadow-lg border border-zinc-300 dark:border-zinc-600 w-80"
+      className="fixed top-4 right-4 bg-white dark:bg-zinc-900 p-3 rounded-lg shadow-lg border border-zinc-300 dark:border-zinc-600"
     >
-      <h3 className="text-sm font-semibold text-black dark:text-white mb-3">
-        Login
-      </h3>
-
-      <div className="space-y-3">
-        <div>
+      <div className="flex items-end gap-2">
+        <div className="flex-1 min-w-0">
           <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
             Usuário
           </label>
@@ -84,18 +80,14 @@ export default function LoginPanel() {
             type="text"
             value={username_input}
             onChange={handleUsernameChange}
-            placeholder="Ex: joao"
-            className="w-full px-3 py-2 text-sm border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800 text-black dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white"
+            placeholder="joao"
+            className="w-full px-2 py-1.5 text-sm border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800 text-black dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-1 focus:ring-black dark:focus:ring-white"
             disabled={loading}
+            title={!usernameValid && username_input ? "Use apenas letras minúsculas (3-20 caracteres)" : ""}
           />
-          {!usernameValid && username_input && (
-            <p className="text-xs text-red-600 dark:text-red-400 mt-1">
-              Use apenas letras minúsculas (3-20 caracteres)
-            </p>
-          )}
         </div>
 
-        <div>
+        <div className="flex-1 min-w-0">
           <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
             PIN
           </label>
@@ -105,35 +97,38 @@ export default function LoginPanel() {
             onChange={handlePinChange}
             placeholder="0000"
             maxLength={4}
-            className="w-full px-3 py-2 text-sm border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800 text-black dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white text-center"
+            className="w-full px-2 py-1.5 text-sm border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800 text-black dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-1 focus:ring-black dark:focus:ring-white text-center"
             disabled={loading}
+            title={pin_input.length < 4 && pin_input ? `${pin_input.length}/4 dígitos` : ""}
           />
-          {pin_input.length < 4 && pin_input && (
-            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
-              {pin_input.length}/4 dígitos
-            </p>
-          )}
-          {pin_input.length === 4 && !pinValid && (
-            <p className="text-xs text-red-600 dark:text-red-400 mt-1">
-              PIN deve conter apenas números
-            </p>
-          )}
         </div>
-
-        {error && (
-          <p className="text-xs text-red-600 dark:text-red-400">
-            {error}
-          </p>
-        )}
 
         <button
           type="submit"
           disabled={!canSubmit}
-          className="w-full px-3 py-2 bg-black dark:bg-white text-white dark:text-black text-sm font-semibold rounded hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+          className="p-1.5 text-black dark:text-white hover:opacity-70 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0"
+          title={loading ? "Entrando..." : "Entrar"}
         >
-          {loading ? 'Entrando...' : 'Entrar'}
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M5 12h14M12 5l7 7-7 7" />
+          </svg>
         </button>
       </div>
+
+      {error && (
+        <p className="text-xs text-red-600 dark:text-red-400 mt-2">
+          {error}
+        </p>
+      )}
     </form>
   );
 }
