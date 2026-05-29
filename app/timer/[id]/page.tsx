@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useTimerState } from '@/lib/useTimerState';
 import TimerDisplay from '@/components/TimerDisplay';
 import QRCodeComponent from '@/components/QRCode';
+import Footer from '@/components/Footer';
 import { useParams } from 'next/navigation';
 
 export default function DesktopTimer() {
@@ -93,6 +94,7 @@ export default function DesktopTimer() {
           </div>
         )}
       </div>
+      <Footer />
     </div>
   );
 }

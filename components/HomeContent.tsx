@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import Footer from './Footer';
 
 export default function HomeContent() {
   const router = useRouter();
@@ -96,6 +97,7 @@ export default function HomeContent() {
           </p>
         )}
       </main>
+      <Footer />
     </div>
   );
 }
