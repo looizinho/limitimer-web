@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/useAuthContext';
 
 export default function LoginPanel() {
@@ -9,6 +9,11 @@ export default function LoginPanel() {
   const [pin_input, setPinInput] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const usernameValid = /^[a-z]{3,20}$/.test(username_input) || username_input === '';
   const pinValid = /^\d{0,4}$/.test(pin_input) && (pin_input === '' || pin_input.length === 4);
@@ -46,7 +51,7 @@ export default function LoginPanel() {
     }
   };
 
-  if (authLoading) {
+  if (authLoading || !isMounted) {
     return null;
   }
 
