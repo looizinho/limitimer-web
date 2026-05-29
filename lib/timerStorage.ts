@@ -23,12 +23,13 @@ function toTimer(record: TimerRecord): Timer {
     currentSeconds: Math.floor(computeCurrentSeconds(record)),
     state: record.state,
     qrCodeScanned: record.qrCodeScanned,
+    ...(record.userId && { userId: record.userId }),
     createdAt: record.createdAt,
     updatedAt: record.updatedAt,
   };
 }
 
-export async function createTimer(eventName: string, initialSeconds: number): Promise<string> {
+export async function createTimer(eventName: string, initialSeconds: number, userId?: string): Promise<string> {
   const id = generateId();
   const now = Date.now();
 
@@ -40,6 +41,7 @@ export async function createTimer(eventName: string, initialSeconds: number): Pr
     startedAt: null,
     state: 'paused',
     qrCodeScanned: false,
+    ...(userId && { userId }),
     createdAt: now,
     updatedAt: now,
   };
