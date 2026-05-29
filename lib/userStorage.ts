@@ -39,7 +39,7 @@ export async function createUser(username: string, pin: string): Promise<User> {
   // Check if username already exists
   const existing = await collection.findOne({ username });
   if (existing) {
-    throw new Error('Username already taken');
+    throw new Error('Usuário já existe');
   }
 
   const id = randomBytes(8).toString('hex');

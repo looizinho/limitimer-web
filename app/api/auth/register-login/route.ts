@@ -46,9 +46,9 @@ export async function POST(request: NextRequest) {
       );
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-      if (errorMessage === 'Username already taken') {
+      if (errorMessage === 'Usuário já existe') {
         return NextResponse.json(
-          { error: 'Username already taken' },
+          { error: 'Usuário já existe' },
           { status: 400 }
         );
       }
