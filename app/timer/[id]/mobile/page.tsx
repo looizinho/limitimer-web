@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useTimerState } from '@/lib/useTimerState';
 import TimerDisplay from '@/components/TimerDisplay';
+import Footer from '@/components/Footer';
 import { useParams } from 'next/navigation';
 
 export default function MobileTimer() {
@@ -128,6 +129,7 @@ export default function MobileTimer() {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }
