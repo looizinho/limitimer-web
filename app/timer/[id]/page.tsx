@@ -13,14 +13,25 @@ export default function DesktopTimer() {
   const { timer, loading, error, reset, markQrScanned } = useTimerState({ timerId });
   const [showQR, setShowQR] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [cleanInterface, setCleanInterface] = useState(false);
 
   useEffect(() => {
     const handleFullscreenChange = () => {
       setIsFullscreen(!!document.fullscreenElement);
     };
 
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setCleanInterface(false);
+      }
+    };
+
     document.addEventListener('fullscreenchange', handleFullscreenChange);
-    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
   }, []);
 
   const toggleFullscreen = async () => {
@@ -69,6 +80,27 @@ export default function DesktopTimer() {
     markQrScanned();
   };
 
+  // Modo limpo - apenas contador com fundo transparente
+  if (cleanInterface) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-transparent text-white p-4">
+        <button
+          onClick={() => setCleanInterface(false)}
+          className="absolute top-4 right-4 p-2 text-white hover:opacity-60 transition-opacity text-sm"
+          title="Voltar à interface completa (ESC)"
+        >
+          ✕ Voltar
+        </button>
+        <div className="flex flex-col items-center gap-4">
+          <TimerDisplay seconds={timer.currentSeconds} size="large" />
+          <p className="text-2xl text-gray-300">
+            {getStatusText()}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-black text-white p-4 relative">
       <button
@@ -85,6 +117,13 @@ export default function DesktopTimer() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4m-4 0l5 5m11-5v4m0-4h-4m4 0l-5 5M4 20v-4m0 4h4m-4 0l5-5m11 5v-4m0 4h-4m4 0l-5-5" />
           </svg>
         )}
+      </button>
+      <button
+        onClick={() => setCleanInterface(true)}
+        className="absolute top-4 left-4 p-2 rounded-lg bg-white text-black hover:opacity-80 transition-opacity text-xs font-semibold"
+        title="Limpar interface - deixa apenas o contador"
+      >
+        Limpar
       </button>
       <div className="flex flex-col items-center gap-8 w-full max-w-2xl">
         <div className="flex justify-between items-start w-full">
