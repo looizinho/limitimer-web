@@ -61,7 +61,7 @@ export default function HomeContent() {
       <main className="flex flex-col items-center justify-center gap-8 px-4 max-w-md w-full">
         <div className="text-center">
           <h1 className="text-4xl sm:text-5xl font-bold text-black dark:text-white mb-4">
-            Limitimer
+            Limitimer Web
           </h1>
           <p className="text-lg sm:text-xl text-zinc-600 font-bold dark:text-zinc-400 mb-8" style={{ color: 'cyan' }}>
             TÉCNICA DE VÍDEO RS

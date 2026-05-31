@@ -54,7 +54,7 @@ export default function UserProfile() {
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link href="/" className="text-2xl font-bold text-black dark:text-white hover:opacity-70 transition-opacity">
-              Limitimer
+              Limitimer Web
             </Link>
           </div>
           <div className="flex items-center gap-4">
