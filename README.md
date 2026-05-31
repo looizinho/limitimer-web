@@ -2,6 +2,12 @@
 
 A countdown timer web application built with Next.js 16, React 19, TypeScript, and Tailwind CSS. It supports user registration/login, multiple timer instances, QR code control, and persists data in MongoDB. Designed for deployment on Vercel.
 
+<div align="center">
+  <a href="https://www.youtube.com/watch?v=To7MAZv7lWc">
+    <img src="https://img.youtube.com/vi/To7MAZv7lWc/0.jpg" alt="Texto Alternativo">
+  </a>
+</div>
+
 ## Table of Contents
 - [Features](#features)
 - [Tech Stack](#tech-stack)
