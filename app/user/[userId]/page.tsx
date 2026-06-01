@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/useAuthContext';
+import { useDataService } from '@/lib/services';
 import { useParams, useRouter } from 'next/navigation';
 import { Timer } from '@/types/timer';
 
@@ -10,6 +11,7 @@ export default function UserProfile() {
   const params = useParams();
   const router = useRouter();
   const { userId, username, isLoggedIn, logout } = useAuth();
+  const dataService = useDataService();
   const [timers, setTimers] = useState<Timer[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -27,10 +29,8 @@ export default function UserProfile() {
     const fetchTimers = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`/api/users/${paramUserId}/timers`);
-        if (!response.ok) throw new Error('Failed to fetch timers');
-        const data = (await response.json()) as { timers: Timer[] };
-        setTimers(data.timers);
+        const userTimers = await dataService.getUserTimers(paramUserId);
+        setTimers(userTimers);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An error occurred');
       } finally {
@@ -41,7 +41,7 @@ export default function UserProfile() {
     if (paramUserId) {
       fetchTimers();
     }
-  }, [paramUserId]);
+  }, [paramUserId, dataService]);
 
   if (!isLoggedIn || userId !== paramUserId) {
     return null;

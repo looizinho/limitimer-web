@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import { useDataService } from '@/lib/services';
 import { Timer } from '@/types/timer';
 
 interface UseTimerStateOptions {
@@ -11,6 +12,7 @@ interface UseTimerStateOptions {
 
 export function useTimerState({ timerId, pollInterval = 1000 }: UseTimerStateOptions) {
   const router = useRouter();
+  const dataService = useDataService();
   const [timer, setTimer] = useState<Timer | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -20,9 +22,9 @@ export function useTimerState({ timerId, pollInterval = 1000 }: UseTimerStateOpt
 
   const fetchTimer = useCallback(async () => {
     try {
-      const response = await fetch(`/api/timers/${timerId}`);
+      const data = await dataService.getTimer(timerId);
 
-      if (response.status === 404) {
+      if (data === null) {
         // Timer not found on server — try to restore from localStorage
         const cached = localStorage.getItem(`timer_${timerId}`);
         if (cached) {
@@ -43,11 +45,6 @@ export function useTimerState({ timerId, pollInterval = 1000 }: UseTimerStateOpt
         return;
       }
 
-      if (!response.ok) {
-        throw new Error('Failed to fetch timer');
-      }
-
-      const data = (await response.json()) as Timer;
       if (isMountedRef.current) {
         setTimer(data);
         setError(null);
@@ -63,7 +60,7 @@ export function useTimerState({ timerId, pollInterval = 1000 }: UseTimerStateOpt
         setLoading(false);
       }
     }
-  }, [timerId, router]);
+  }, [timerId, router, dataService]);
 
   const pollTimer = useCallback(() => {
     fetchTimer();
@@ -88,13 +85,12 @@ export function useTimerState({ timerId, pollInterval = 1000 }: UseTimerStateOpt
   const updateTimer = useCallback(
     async (action: string, seconds?: number) => {
       try {
-        const response = await fetch(`/api/timers/${timerId}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action, seconds }),
+        const data = await dataService.updateTimer(timerId, {
+          action: action as 'start' | 'pause' | 'stop' | 'reset' | 'set-time' | 'mark-qr-scanned',
+          seconds
         });
 
-        if (response.status === 404) {
+        if (data === null) {
           // Timer expired
           if (!hasShownExpiredRef.current) {
             hasShownExpiredRef.current = true;
@@ -105,11 +101,6 @@ export function useTimerState({ timerId, pollInterval = 1000 }: UseTimerStateOpt
           return null;
         }
 
-        if (!response.ok) {
-          throw new Error('Failed to update timer');
-        }
-
-        const data = (await response.json()) as Timer;
         if (isMountedRef.current) {
           setTimer(data);
           localStorage.setItem(`timer_${timerId}`, JSON.stringify(data));
@@ -122,7 +113,7 @@ export function useTimerState({ timerId, pollInterval = 1000 }: UseTimerStateOpt
         return null;
       }
     },
-    [timerId, router]
+    [timerId, router, dataService]
   );
 
   return {
