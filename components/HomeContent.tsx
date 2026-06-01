@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/useAuthContext';
+import { useDataService } from '@/lib/services';
 import Footer from './Footer';
 import LoginPanel from './LoginPanel';
 
@@ -10,6 +11,7 @@ export default function HomeContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { userId } = useAuth();
+  const dataService = useDataService();
   const [eventName, setEventName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -27,21 +29,11 @@ export default function HomeContent() {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch('/api/timers', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          eventName: eventName || 'Sem nome',
-          initialSeconds: 60,
-          ...(userId && { userId }),
-        }),
+      const data = await dataService.createTimer({
+        eventName: eventName || 'Sem nome',
+        initialSeconds: 60,
+        ...(userId && { userId }),
       });
-
-      if (!response.ok) {
-        throw new Error('Failed to create timer');
-      }
-
-      const data = await response.json() as { id: string };
       router.push(`/timer/${data.id}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');

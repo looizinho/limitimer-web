@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { useDataService } from '@/lib/services';
 import { AuthContextType } from '@/types/user';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -9,6 +10,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [userId, setUserId] = useState<string | null>(null);
   const [username, setUsername] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const dataService = useDataService();
 
   // Initialize from localStorage on mount
   useEffect(() => {
@@ -24,18 +26,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = async (username: string, pin: string) => {
-    const response = await fetch('/api/auth/register-login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, pin }),
-    });
-
-    if (!response.ok) {
-      const data = await response.json();
-      throw new Error(data.error || 'Login failed');
-    }
-
-    const data = (await response.json()) as { userId: string; username: string };
+    const data = await dataService.registerOrLogin(username, pin);
     setUserId(data.userId);
     setUsername(data.username);
     localStorage.setItem('limitimer_userId', data.userId);
