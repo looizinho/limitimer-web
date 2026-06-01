@@ -74,6 +74,55 @@ App Router convention: file structure maps directly to routes. Create new routes
 
 The project enables `sharp` (image optimization) and `unrs-resolver` in the pnpm workspace configuration. These allow smooth Next.js image handling without additional setup.
 
+## Dual-Target Build System (Phase 2+)
+
+This project uses `BUILD_TARGET` environment variable to generate different builds:
+
+### Web Target (`BUILD_TARGET` absent or empty)
+- **Default target**
+- Generates SSR build for Vercel
+- Uses API Routes (Node.js runtime)
+- All configuration unchanged from pre-Phase-2 state
+- Commands: `pnpm dev`, `pnpm build`, `pnpm start`
+
+### Tauri Target (`BUILD_TARGET=tauri`)
+- Generates static export in `out/` directory
+- No Next.js Server runtime required
+- API Routes are skipped (not included in export)
+- Backend runs via Tauri Commands (Rust) in Phase 3
+- Data layer uses DataServiceProvider → TauriDataService → tauri::invoke()
+- Commands: `pnpm tauri:dev`, `pnpm tauri:build`
+
+### Configuration
+
+**`next.config.ts`:**
+- Reads `BUILD_TARGET` environment variable
+- Sets `output: 'export'` for Tauri, undefined (SSR) for web
+- Disables image optimization for Tauri (no sharp available in desktop)
+- Sets asset prefix for Tauri dev mode routing
+
+**Dynamic routes** (`app/timer/[id]/page.tsx`, `app/user/[userId]/page.tsx`):
+- Implement `generateStaticParams()` returning empty array
+- Set `dynamicParams = true` to allow client-side routing
+- In Tauri export, these use client-side navigation and data fetching
+- In web SSR, these behave normally (SSR still works)
+
+### Development Workflow
+
+**For web development (99% of work):**
+```bash
+pnpm dev      # Runs with default (web) config
+pnpm build    # Vercel-compatible SSR build
+```
+
+**For Tauri testing (before Phase 3 integration):**
+```bash
+pnpm tauri:dev    # Tests Tauri config locally
+pnpm tauri:build  # Tests static export generation
+```
+
 ## Deployment
 
 This project is configured for Vercel deployment. Build artifacts go to `.next/` (excluded from git). See README.md for deployment instructions.
+
+For Tauri desktop builds, use `BUILD_TARGET=tauri pnpm build` to generate a static export in `out/`.
