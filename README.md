@@ -133,6 +133,29 @@ The app reads `process.env.MONGO_URL` to connect to MongoDB. Ensure the variable
 - **Control** – Desktop (`/timer/:id`) and mobile (`/timer/:id/mobile`) pages use the `useTimerState` hook to poll the timer every second and expose actions (`start`, `pause`, `stop`, `reset`, `set-time`).
 - **QR Code** – `QRCode` component renders a QR code linking to the mobile view, allowing remote control of the timer. Scanning the QR code automatically marks the timer as “QR scanned” via `markQrScanned`.
 
+## Dual-Target Build System
+
+This project supports two build targets:
+
+### Web Build (Default)
+```bash
+pnpm dev       # Local development
+pnpm build     # Production SSR build for Vercel
+pnpm start     # Run production server locally
+```
+
+The web build is a standard Next.js SSR application deployed to Vercel.
+
+### Tauri Build (In Development)
+```bash
+pnpm tauri:dev    # Development server with Tauri config
+pnpm tauri:build  # Static export to out/ directory
+```
+
+The Tauri build generates a static export for embedding in the Tauri desktop app. This is in active development (Phase 2-3).
+
+**Note:** Use `pnpm build` (web) for Vercel deployment. Use `pnpm tauri:build` for desktop testing.
+
 ## Deployment
 The project is ready for Vercel:
 ```bash
