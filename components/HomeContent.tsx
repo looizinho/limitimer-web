@@ -48,23 +48,23 @@ export default function HomeContent() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-zinc-50 to-white dark:from-black dark:to-zinc-900">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-muted/50 to-background">
       <LoginPanel />
-      <main className="flex flex-col items-center justify-center gap-8 px-4 max-w-md w-full">
+      <main className="flex flex-col items-center justify-center gap-8 px-4 max-w-md w-full pb-24">
         <div className="text-center">
-          <h1 className="text-4xl sm:text-5xl font-bold text-black dark:text-white mb-4">
+          <h1 className="text-4xl sm:text-5xl font-bold text-foreground mb-4 text-balance">
             Limitimer Web
           </h1>
-          <p className="text-lg sm:text-xl text-zinc-600 font-bold dark:text-zinc-400 mb-8" style={{ color: 'cyan' }}>
+          <p className="text-lg sm:text-xl font-bold text-accent mb-8">
             TÉCNICA DE VÍDEO RS
           </p>
-          <p className="text-lg sm:text-xl text-zinc-600 dark:text-zinc-400 mb-8">
+          <p className="text-lg sm:text-xl text-muted-foreground mb-8 text-pretty">
             Contador de tempo regressivo para eventos
           </p>
         </div>
 
         <div className="w-full">
-          <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
+          <label className="block text-sm font-medium text-muted-foreground mb-2">
             Nome do Evento
           </label>
           <input
@@ -73,14 +73,14 @@ export default function HomeContent() {
             onChange={(e) => setEventName(e.target.value)}
             onKeyPress={handleKeyPress}
             placeholder="Ex: Reunião, Apresentação..."
-            className="w-full px-4 py-2 rounded-lg border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-900 text-black dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white"
+            className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
           />
         </div>
 
         <button
           onClick={handleCreateTimer}
           disabled={loading}
-          className="w-full px-8 py-3 bg-black dark:bg-white text-white dark:text-black rounded-lg font-semibold text-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full px-8 py-3 bg-primary text-primary-foreground rounded-lg font-semibold text-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? 'Criando...' : 'Criar Timer'}
         </button>

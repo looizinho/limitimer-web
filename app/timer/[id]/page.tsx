@@ -48,7 +48,7 @@ export default function DesktopTimer() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-black text-white">
+      <div className="flex items-center justify-center min-h-screen bg-background text-foreground">
         <p>Carregando...</p>
       </div>
     );
@@ -56,7 +56,7 @@ export default function DesktopTimer() {
 
   if (error || !timer) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-black text-white">
+      <div className="flex items-center justify-center min-h-screen bg-background text-foreground">
         <p>Erro ao carregar timer: {error}</p>
       </div>
     );
@@ -83,17 +83,18 @@ export default function DesktopTimer() {
   // Modo limpo - apenas contador com fundo transparente
   if (cleanInterface) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-transparent text-white p-4">
+      <div className="flex items-center justify-center min-h-screen bg-transparent text-foreground p-4">
         <button
           onClick={() => setCleanInterface(false)}
-          className="absolute top-4 right-4 p-2 text-white hover:opacity-60 transition-opacity text-sm"
+          className="absolute top-4 right-4 p-2 text-foreground hover:opacity-60 transition-opacity text-sm"
           title="Voltar à interface completa (ESC)"
+          aria-label="Voltar à interface completa"
         >
           ✕ Voltar
         </button>
         <div className="flex flex-col items-center gap-4">
           <TimerDisplay seconds={timer.currentSeconds} size="large" />
-          <p className="text-2xl text-gray-300">
+          <p className="text-2xl text-muted-foreground">
             {getStatusText()}
           </p>
         </div>
@@ -102,11 +103,12 @@ export default function DesktopTimer() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-black text-white p-4 relative">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-background text-foreground p-4 pb-24 relative">
       <button
         onClick={toggleFullscreen}
-        className="absolute top-4 right-4 p-2 rounded-lg bg-white text-black hover:opacity-80 transition-opacity"
+        className="absolute top-4 right-4 p-2 rounded-lg bg-primary text-primary-foreground hover:opacity-80 transition-opacity"
         title={isFullscreen ? 'Sair de Tela Cheia' : 'Tela Cheia'}
+        aria-label={isFullscreen ? 'Sair de Tela Cheia' : 'Tela Cheia'}
       >
         {isFullscreen ? (
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -120,18 +122,19 @@ export default function DesktopTimer() {
       </button>
       <button
         onClick={() => setCleanInterface(true)}
-        className="absolute top-4 left-4 p-2 rounded-lg bg-white text-black hover:opacity-80 transition-opacity text-xs font-semibold"
+        className="absolute top-4 left-4 p-2 rounded-lg bg-muted text-foreground hover:opacity-80 transition-opacity text-xs font-semibold"
         title="Limpar interface - deixa apenas o contador"
+        aria-label="Modo limpo"
       >
         Limpar
       </button>
       <div className="flex flex-col items-center gap-8 w-full max-w-2xl">
         <div className="flex justify-between items-start w-full">
-          <h1 className="text-3xl font-bold">{timer.eventName}</h1>
+          <h1 className="text-3xl font-bold text-foreground">{timer.eventName}</h1>
           {!timer.qrCodeScanned && !showQR && (
             <button
               onClick={handleShowQR}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg font-semibold text-sm transition-colors"
+              className="px-4 py-2 bg-accent text-accent-foreground rounded-lg font-semibold text-sm transition-colors hover:opacity-80"
             >
               Mostrar QR
             </button>
@@ -140,20 +143,20 @@ export default function DesktopTimer() {
 
         <div>
           <TimerDisplay seconds={timer.currentSeconds} size="large" />
-          <p className="text-center text-2xl mt-4 text-gray-400">
+          <p className="text-center text-2xl mt-4 text-muted-foreground">
             {getStatusText()}
           </p>
         </div>
 
         {timer.state === 'finished' && (
-          <div className="text-4xl font-bold text-green-500 text-center">
+          <div className="text-4xl font-bold text-success text-center">
             ✓ Tempo finalizado!
           </div>
         )}
 
         <button
           onClick={() => reset()}
-          className="px-6 py-3 bg-gray-700 hover:bg-gray-600 rounded-lg font-semibold transition-colors"
+          className="px-6 py-3 bg-muted text-foreground hover:opacity-80 rounded-lg font-semibold transition-colors"
         >
           Resetar
         </button>
@@ -163,7 +166,7 @@ export default function DesktopTimer() {
             <QRCodeComponent timerId={timerId} />
             <button
               onClick={() => setShowQR(false)}
-              className="px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100 rounded transition-colors"
+              className="px-4 py-2 text-sm font-semibold text-muted-foreground hover:bg-muted rounded transition-colors"
             >
               Ocultar QR
             </button>

@@ -58,16 +58,16 @@ export default function LoginPanel() {
 
   if (isLoggedIn && userId) {
     return (
-      <div className="fixed top-4 right-4 flex items-center gap-3 bg-white dark:bg-zinc-900 px-4 py-2 rounded-lg shadow-lg border border-zinc-300 dark:border-zinc-600">
+      <div className="fixed top-4 right-4 flex items-center gap-3 bg-background px-4 py-2 rounded-lg shadow-lg border border-border">
         <Link
           href={`/user/${userId}`}
-          className="text-sm font-medium text-black dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+          className="text-sm font-medium text-foreground hover:text-accent transition-colors"
         >
           {username}
         </Link>
         <button
           onClick={logout}
-          className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-sm rounded transition-colors"
+          className="px-3 py-1 bg-destructive hover:opacity-80 text-destructive-foreground text-sm rounded transition-colors"
         >
           Sair
         </button>
@@ -78,11 +78,11 @@ export default function LoginPanel() {
   return (
     <form
       onSubmit={handleLogin}
-      className="fixed top-4 right-4 bg-white dark:bg-zinc-900 p-3 rounded-lg shadow-lg border border-zinc-300 dark:border-zinc-600"
+      className="fixed top-4 right-4 bg-background p-3 rounded-lg shadow-lg border border-border"
     >
       <div className="flex items-end gap-2">
         <div className="flex-1 min-w-0">
-          <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
+          <label className="block text-xs font-medium text-muted-foreground mb-1">
             Usuário
           </label>
           <input
@@ -90,14 +90,14 @@ export default function LoginPanel() {
             value={username_input}
             onChange={handleUsernameChange}
             placeholder="joao"
-            className="w-full px-2 py-1.5 text-sm border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800 text-black dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-1 focus:ring-black dark:focus:ring-white"
+            className="w-full px-2 py-1.5 text-sm border border-border rounded bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
             disabled={loading}
             title={!usernameValid && username_input ? "Use apenas letras minúsculas (3-20 caracteres)" : ""}
           />
         </div>
 
         <div className="flex-1 min-w-0">
-          <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
+          <label className="block text-xs font-medium text-muted-foreground mb-1">
             PIN
           </label>
           <input
@@ -106,7 +106,7 @@ export default function LoginPanel() {
             onChange={handlePinChange}
             placeholder="0000"
             maxLength={4}
-            className="w-full px-2 py-1.5 text-sm border border-zinc-300 dark:border-zinc-600 rounded bg-white dark:bg-zinc-800 text-black dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-1 focus:ring-black dark:focus:ring-white text-center"
+            className="w-full px-2 py-1.5 text-sm border border-border rounded bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring text-center"
             disabled={loading}
             title={pin_input.length < 4 && pin_input ? `${pin_input.length}/4 dígitos` : ""}
           />
@@ -115,8 +115,9 @@ export default function LoginPanel() {
         <button
           type="submit"
           disabled={!canSubmit}
-          className="p-1.5 text-black dark:text-white hover:opacity-70 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0"
+          className="p-1.5 text-foreground hover:opacity-70 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0"
           title={loading ? "Entrando..." : "Entrar"}
+          aria-label="Entrar"
         >
           <svg
             width="24"

@@ -23,16 +23,16 @@ export default function MobileTimer() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-black">
-        <p className="text-gray-600 dark:text-gray-400">Carregando...</p>
+      <div className="flex items-center justify-center min-h-screen bg-background">
+        <p className="text-muted-foreground">Carregando...</p>
       </div>
     );
   }
 
   if (error || !timer) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-black">
-        <p className="text-red-600 dark:text-red-400">Erro ao carregar timer</p>
+      <div className="flex items-center justify-center min-h-screen bg-background">
+        <p className="text-destructive">Erro ao carregar timer</p>
       </div>
     );
   }
@@ -59,21 +59,21 @@ export default function MobileTimer() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 dark:bg-black p-4">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-background p-4 pb-24">
       <div className="w-full max-w-md">
-        <h1 className="text-2xl font-bold text-center mb-2 text-black dark:text-white">
+        <h1 className="text-2xl font-bold text-center mb-2 text-foreground">
           {timer.eventName}
         </h1>
-        <h2 className="text-lg text-center mb-8 text-zinc-600 dark:text-zinc-400">
+        <h2 className="text-lg text-center mb-8 text-muted-foreground">
           Controle do Timer
         </h2>
 
-        <div className="bg-white dark:bg-zinc-900 rounded-lg p-6 mb-6">
-          <p className="text-center text-gray-600 dark:text-gray-400 mb-2">Tempo atual</p>
+        <div className="bg-muted rounded-lg p-6 mb-6">
+          <p className="text-center text-muted-foreground mb-2">Tempo atual</p>
           <div className="flex justify-center mb-4">
             <TimerDisplay seconds={timer.currentSeconds} size="small" />
           </div>
-          <p className="text-center text-sm text-gray-500 dark:text-gray-400">
+          <p className="text-center text-sm text-muted-foreground">
             Status: {getStatusText()}
           </p>
         </div>
@@ -85,12 +85,12 @@ export default function MobileTimer() {
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               placeholder="Segundos"
-              className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-zinc-900 text-black dark:text-white"
+              className="flex-1 px-4 py-2 border border-border rounded-lg bg-background text-foreground"
               min="1"
             />
             <button
               onClick={handleSetTime}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="px-4 py-2 bg-accent text-accent-foreground rounded-lg hover:opacity-80 transition-colors"
             >
               Definir
             </button>
@@ -100,14 +100,14 @@ export default function MobileTimer() {
             <button
               onClick={() => start()}
               disabled={timer.state === 'running'}
-              className="px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
+              className="px-4 py-3 bg-success text-success-foreground rounded-lg hover:opacity-80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
             >
               Iniciar
             </button>
             <button
               onClick={() => pause()}
               disabled={timer.state !== 'running'}
-              className="px-4 py-3 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
+              className="px-4 py-3 bg-amber-500 text-white rounded-lg hover:opacity-80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
             >
               Pausar
             </button>
@@ -116,13 +116,13 @@ export default function MobileTimer() {
           <div className="grid grid-cols-2 gap-3">
             <button
               onClick={() => stop()}
-              className="px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold"
+              className="px-4 py-3 bg-destructive text-destructive-foreground rounded-lg hover:opacity-80 transition-colors font-semibold"
             >
               Parar
             </button>
             <button
               onClick={() => reset()}
-              className="px-4 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-semibold"
+              className="px-4 py-3 bg-muted text-foreground rounded-lg hover:opacity-80 transition-colors font-semibold"
             >
               Resetar
             </button>

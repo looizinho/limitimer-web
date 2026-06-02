@@ -1,12 +1,13 @@
 export default function Footer() {
   return (
-    <footer className="fixed bottom-0 left-0 right-0 p-4 flex justify-center">
+    <footer className="fixed bottom-0 left-0 right-0 p-4 flex justify-center pointer-events-none">
       <a
         href="https://github.com/looizinho/limitimer-web"
         target="_blank"
         rel="noopener noreferrer"
-        className="flex items-center gap-2 px-4 py-2 rounded-lg bg-black dark:bg-white text-white dark:text-black hover:opacity-80 transition-opacity"
+        className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:opacity-80 transition-opacity pointer-events-auto"
         title="Ver no GitHub"
+        aria-label="Ver código no GitHub"
       >
         <svg
           width="20"
